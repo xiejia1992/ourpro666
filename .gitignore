@@ -1,0 +1,5 @@
+.idea/
+db.sqlite3
+ourproapp/migrations/
+ourpro/*.pyc
+ourproapp/*.pyc
