@@ -9,7 +9,7 @@ from django.db import models
 class User(models.Model):
     '''  定义用户模型 '''
     user_name = models.CharField(max_length=128)
-    user_password = models.CharField(max_length=64)
+    user_password = models.CharField(max_length=256)
 
     def __unicode__(self):
         return self.user_name
