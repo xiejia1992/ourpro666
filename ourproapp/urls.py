@@ -5,10 +5,11 @@ from ourproapp import views
 # Create your views here.
 
 urlpatterns = [
+    url(r'^check_register$', views.check_register),
     url(r'^register$', views.register),
     url(r'^login$', views.login),
     url(r'^api/users$', views.user_list),
-    url(r'^api/users/(?P<id>(\d+))/$', views.user_detail),
+    #url(r'^api/users/(?P<id>(\d+))/$', views.user_detail),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

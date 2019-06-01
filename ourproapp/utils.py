@@ -60,9 +60,12 @@ def check_token(token):
     return False
 
 
-def user_check(username, password):
+def check_user_login(user, password):
     try:
-        user = User.objects.get(user_name=username)
+        if '@' in user:
+            user = User.objects.get(user_email=user)
+        else:
+            user = User.objects.get(user_mobile=user)
     except User.DoesNotExist:
         return None
     if user:
@@ -70,3 +73,12 @@ def user_check(username, password):
             return True
     return False
 
+
+def check_user_exists(user):
+    if User.objects.filter(user_mobile=user) or User.objects.filter(user_email=user):
+        return True
+
+
+def check_register_code(user, identifying_code):
+    if cache.get(user + "_identifying_code") == identifying_code:
+        return True

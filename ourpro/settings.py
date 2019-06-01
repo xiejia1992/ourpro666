@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import datetime
+import djcelery
+from ourpro_config import RABBITMQ_URL
+djcelery.setup_loader()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'djcelery',
     'ourproapp',
     'corsheaders',
 ]
@@ -73,6 +77,7 @@ CORS_ALLOW_HEADERS = (
     'X_FILENAME',
     'accept-encoding',
     'authorization',
+    'auth',
     'content-type',
     'dnt',
     'origin',
@@ -83,6 +88,8 @@ CORS_ALLOW_HEADERS = (
 )
 
 ROOT_URLCONF = 'ourpro.urls'
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+BROKER_URL = RABBITMQ_URL
 
 TEMPLATES = [
     {
@@ -160,3 +167,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
