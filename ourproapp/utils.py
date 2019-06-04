@@ -5,13 +5,15 @@ import hashlib
 import base64
 from django.core import signing
 from django.core.cache import cache
+from rest_framework.response import Response
+from serializer import ResponseSerializer
 from models import User
 
 #defalut config about token
 HEADER = {'typ': 'JWP', 'alg': 'default'}
 KEY = 'our_pro_666'
 SALT = 'www.ourpro.cn'
-TIME_OUT = 5 * 60
+TIME_OUT = 10 * 60
 
 
 def encrypt(obj):
@@ -28,16 +30,16 @@ def decrypt(src):
     return raw
 
 
-def create_token(username):
+def create_token(user):
     """生成token信息"""
     header = encrypt(HEADER)
-    payload = {"username": username, "iat": time.time()}
+    payload = {"user": user, "iat": time.time()}
     payload = encrypt(payload)
     md5 = hashlib.md5()
     md5.update(("%s.%s" % (header, payload)).encode())
     signature = md5.hexdigest()
     token = "%s.%s.%s" % (header, payload, signature)
-    cache.set(username, token, TIME_OUT)
+    cache.set(user + '_Token', token, TIME_OUT)
     return token
 
 
@@ -47,17 +49,26 @@ def get_payload(token):
     return payload
 
 
-def get_username(token):
+def get_user(token):
     payload = get_payload(token)
-    return payload['username']
+    return payload['user']
 
 
-def check_token(token):
-    username = get_username(token)
-    last_token = cache.get(username)
-    if last_token:
-        return last_token == token
-    return False
+def check_token(func):
+    def wrapper(request, *args, **kwargs):
+        _response = {'message': "Token has expired", 'status_code': 403}
+        if request.META['HTTP_AUTH']:
+            _token = request.META['HTTP_AUTH']
+            user = get_user(_token)
+            last_token = cache.get(user + '_Token')
+            if last_token:
+                if last_token == _token:
+                    cache.set(user + '_Token', _token, TIME_OUT)
+                    return func(request, *args, **kwargs)
+                return Response(ResponseSerializer(_response).data)
+            return Response(ResponseSerializer(_response).data)
+        return Response(ResponseSerializer(_response).data)
+    return wrapper
 
 
 def check_user_login(user, password):

@@ -74,14 +74,11 @@ def login(request):
 
 
 @api_view(['GET'])
+@check_token
 def user_list(request):
-    if check_token(request.META['HTTP_AUTH']):
-        return get_model_list(request=request,
-                              Model=User,
-                              Serializer=UserSerializer)
-    else:
-        response = {'message': "Token has expired", 'status_code': 403}
-        return Response(ResponseSerializer(response).data)
+    return get_model_list(request=request,
+                          Model=User,
+                          Serializer=UserSerializer)
 
 
 # @api_view(['GET', 'PUT', 'DELETE'])
