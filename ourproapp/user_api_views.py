@@ -20,11 +20,11 @@ def check_register(request):
     else:
         if len(user) == 11 and '@' not in user:
             sender_identifying_code_to_mobile.delay(user)
-            register_identifying_response = {'message': "The mobile identifying code send successfully", 'status_code': 200}
+            register_identifying_response = {'message': "The identifying code send successfully", 'status_code': 200}
             return Response(ResponseSerializer(register_identifying_response).data)
         else:
             sender_identifying_code_to_email.delay(user)
-            register_identifying_response = {'message': "The email identifying code send successfully", 'status_code': 200}
+            register_identifying_response = {'message': "The identifying code send successfully", 'status_code': 200}
             return Response(ResponseSerializer(register_identifying_response).data)
 
 
@@ -49,6 +49,43 @@ def register(request):
             )
             user.save()
             register_response = {'message': "Register user successfully", 'status_code': 200}
+            return Response(ResponseSerializer(register_response).data)
+    else:
+        register_response = {'message': "The identifying code expired", 'status_code': 400}
+        return Response(ResponseSerializer(register_response).data)
+
+
+@api_view(['POST'])
+def forget_password(request):
+    user = request.data["user"]
+    if check_user_exists(user):
+        if len(user) == 11 and '@' not in user:
+            sender_identifying_code_to_mobile.delay(user)
+            register_identifying_response = {'message': "The mobile identifying code send successfully", 'status_code': 200}
+            return Response(ResponseSerializer(register_identifying_response).data)
+        else:
+            sender_identifying_code_to_email.delay(user)
+            register_identifying_response = {'message': "The email identifying code send successfully", 'status_code': 200}
+            return Response(ResponseSerializer(register_identifying_response).data)
+    register_identifying_response = {'message': "The user not found", 'status_code': 404}
+    return Response(ResponseSerializer(register_identifying_response).data)
+
+
+@api_view(['POST'])
+def reset_password(request):
+    user, identifying_code, new_password = request.data["user"], request.data["identifying_code"], request.data["new_password"]
+    if check_register_code(user, identifying_code):
+        if "@" in user:
+            user = User.objects.get(user_email=user)
+            user.user_password = base64.encodestring(new_password)
+            user.save()
+            register_response = {'message': "Reset password successfully", 'status_code': 200}
+            return Response(ResponseSerializer(register_response).data)
+        else:
+            user = User.objects.get(user_mobile=user)
+            user.user_password = base64.encodestring(new_password)
+            user.save()
+            register_response = {'message': "Reset password successfully", 'status_code': 200}
             return Response(ResponseSerializer(register_response).data)
     else:
         register_response = {'message': "The identifying code expired", 'status_code': 400}

@@ -9,7 +9,7 @@ celery -A ourpro worker --loglevel=INFO
 API接口说明文档：
 
 --------------------------------------------------------------------
-/check_register
+api/check_register
 #该接口检查用户是否在数据库中已经存在。
 #如果不存在，则返回successful,并且发送验证码，验证码有效期为3分钟
 #如果存在，则返回failed
@@ -41,7 +41,7 @@ failed 返回一种结果
 }
 
 --------------------------------------------------------------------
-/register
+api/register
 #该接口检查注册验证码是否过期，并将用户数据注册到数据库
 #如果注册验证码未过期，则返回successful，并跳转值登陆页面
 如果注册验证码已经过期，则返回failed
@@ -70,7 +70,7 @@ failed 返回一种结果
 
 
 --------------------------------------------------------------------
-/login
+api/login
 #该接口验证用户帐号密码是否正确，用于用户登陆
 #如果正确，则返回successful, 并跳转至首页
 #如果不正确，则返回failed。
@@ -101,6 +101,62 @@ failed 返回两种结果
 {
     "message": "User login failed",
     "status_code": 403
+}
+
+--------------------------------------------------------------------
+api/forget_password
+#忘记密码接口，该接口验证用户是否存在
+#如果用户存在，则返回successful, 并发送验证码
+#如果不正确，则返回failed。
+
+method: POST
+
+DATA: {
+    "user": "xxxx"              #代表用户登陆帐号，需前端验证只能是手机号或者邮箱
+    }
+
+Response: successful
+successful 返回一种结果
+{
+    "message": "The identifying code send successfully",
+    "status_code": 200
+}
+
+Response: failed
+failed 返回1种结果
+（1）用户不存在
+{
+    "message": "The user was not found",
+    "status_code": 404
+}
+
+--------------------------------------------------------------------
+api/reset_password
+#忘记密码接口，该接口验证用户是否存在
+#如果用户存在，则返回successful, 并发送验证码
+#如果不正确，则返回failed。
+
+method: POST
+
+DATA: {
+    "user": "xxxx",              #用户登陆帐号，需前端验证只能是手机号或者邮箱
+    "identifying_code": "xxxxxx" #用户收到的6数字位验证码
+    "new_password": "xxxx"       #用户新密码
+    }
+
+Response: successful
+successful 返回一种结果
+{
+    "message": "The password has exchanged successfully",
+    "status_code": 200
+}
+
+Response: failed
+failed 返回1种结果
+（1）用户不存在
+{
+    "message": "The identifying code expired",
+    "status_code": 400
 }
 
 --------------------------------------------------------------------
