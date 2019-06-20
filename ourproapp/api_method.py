@@ -20,7 +20,7 @@ def add_model(request=None, Model=None, Serializer=None):
 
 def get_model_id(request=None, id=None, Model=None, Serializer=None):
     try:
-        model = Model.objects.get(id=id)
+        model = Model.objects.get(user_id=id)
     except Model.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = Serializer(model)
@@ -29,7 +29,7 @@ def get_model_id(request=None, id=None, Model=None, Serializer=None):
 
 def put_model_id(request=None, id=None, Model=None, Serializer=None):
     try:
-        model = Model.objects.get(id=id)
+        model = Model.objects.get(user_id=id)
     except Model.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = Serializer(model, data=request.data)
@@ -41,7 +41,7 @@ def put_model_id(request=None, id=None, Model=None, Serializer=None):
 
 def delete_model_id(request=None, id=None, Model=None,):
     try:
-        model = Model.objects.get(id=id)
+        model = Model.objects.get(user_id=id)
     except Model.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     model.delete()

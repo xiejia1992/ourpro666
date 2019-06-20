@@ -11,4 +11,4 @@ class ResponseSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "user_mobile", "user_email")
+        fields = ("user_id", "user_image", "user_mobile", "user_email")

@@ -3,6 +3,7 @@
 import time
 import hashlib
 import base64
+import random
 from django.core import signing
 from django.core.cache import cache
 from rest_framework.response import Response
@@ -14,6 +15,13 @@ HEADER = {'typ': 'JWP', 'alg': 'default'}
 KEY = 'our_pro_666'
 SALT = 'www.ourpro.cn'
 TIME_OUT = 10 * 60
+
+
+def create_user_id():
+    timestamp = str(int(time.time()))
+    random_int = str(random.randint(0000, 9999))
+    user_id = random_int[:2] + timestamp[:5] + random_int[2:] + timestamp[5:]
+    return user_id
 
 
 def encrypt(obj):
@@ -30,16 +38,16 @@ def decrypt(src):
     return raw
 
 
-def create_token(user):
+def create_token(user_id):
     """生成token信息"""
     header = encrypt(HEADER)
-    payload = {"user": user, "iat": time.time()}
+    payload = {"user_id": user_id, "iat": time.time()}
     payload = encrypt(payload)
     md5 = hashlib.md5()
     md5.update(("%s.%s" % (header, payload)).encode())
     signature = md5.hexdigest()
     token = "%s.%s.%s" % (header, payload, signature)
-    cache.set(user + '_Token', token, TIME_OUT)
+    cache.set(user_id + '_Token', token, TIME_OUT)
     return token
 
 
@@ -49,9 +57,9 @@ def get_payload(token):
     return payload
 
 
-def get_user(token):
+def get_user_id(token):
     payload = get_payload(token)
-    return payload['user']
+    return payload['user_id']
 
 
 def check_token(func):
@@ -59,12 +67,12 @@ def check_token(func):
         _response = {'message': "Token has expired", 'status_code': 403}
         if request.META['HTTP_AUTH']:
             _token = request.META['HTTP_AUTH']
-            user = get_user(_token)
-            last_token = cache.get(user + '_Token')
+            user_id = get_user_id(_token)
+            last_token = cache.get(user_id + '_Token')
             if last_token:
                 if last_token == _token:
-                    cache.set(user + '_Token', _token, TIME_OUT)
-                    return func(request, *args, **kwargs)
+                    cache.set(user_id + '_Token', _token, TIME_OUT)
+                    return func(request, user_id, *args, **kwargs)
                 return Response(ResponseSerializer(_response).data)
             return Response(ResponseSerializer(_response).data)
         return Response(ResponseSerializer(_response).data)
@@ -81,7 +89,7 @@ def check_user_login(user, password):
         return None
     if user:
         if user.user_password == base64.encodestring(password):
-            return True
+            return user.user_id
     return False
 
 

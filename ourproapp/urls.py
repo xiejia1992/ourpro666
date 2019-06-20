@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^api/forget_password', user_api_views.forget_password),
     url(r'^api/reset_password', user_api_views.reset_password),
     url(r'^api/users$', user_api_views.user_list),
+    url(r'^api/userinfo$', user_api_views.user_info),
 
     #url(r'^api/users/(?P<id>(\d+))/$', views.user_detail),
 ]

@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import datetime
 import djcelery
-from ourpro_config import RABBITMQ_URL
+from ourpro_config import RABBITMQ_URL, DEBUG_STATUS, REDIS_LOCATION
 djcelery.setup_loader()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -27,7 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5-lzfw5rke+9+dmbg17!0w-^)#r%mqvbu0k%hsjgphqy($cm1u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = DEBUG_STATUS
 
 ALLOWED_HOSTS = ['*']
 
@@ -123,7 +123,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "LOCATION": REDIS_LOCATION,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
