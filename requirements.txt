@@ -1,5 +1,5 @@
 Django==1.11.10
-djangorestframework==3.7.7
+djangorestframework==3.11.2
 celery==3.1.26.post2
 django-celery==3.3.0
 yunpian-python-sdk==1.0.0
